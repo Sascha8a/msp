@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <pthread.h>
 #include <asio.hpp>
 #include <condition_variable>
 #include <functional>
@@ -222,6 +223,12 @@ public:
         if(!data) return sendData(id);
         return sendData(id, *data);
     }
+
+    /**
+     * @brief Updates the receiver thread to Realtime priority
+     * @return True on success
+     */
+    bool setRealtimePriority();
 
 protected:
     /**

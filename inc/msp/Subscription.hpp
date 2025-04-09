@@ -81,6 +81,18 @@ public:
         }
     }
 
+    /**
+     * @brief Updates the timer thread to Realtime priority
+     * @return True on success
+     */
+    bool setRealtimePriority() {
+        if(timer_) {
+            return timer_->setRealtimePriority();
+        }
+
+        return true;
+    }
+
 protected:
     std::unique_ptr<PeriodicTimer> timer_;
 };

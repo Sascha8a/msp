@@ -59,4 +59,11 @@ void PeriodicTimer::setPeriod(const double& period_seconds) {
     start();
 }
 
+bool PeriodicTimer::setRealtimePriority() {
+    sched_param sch_params;
+    sch_params.sched_priority = 80;
+
+    return pthread_setschedparam(this->thread_ptr->native_handle(), SCHED_FIFO, &sch_params) == 0;
+}
+
 }  // namespace msp

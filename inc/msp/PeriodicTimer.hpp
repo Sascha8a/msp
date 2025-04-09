@@ -7,6 +7,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <pthread.h>
 
 namespace msp {
 
@@ -47,6 +48,12 @@ public:
      * @param period_seconds period in seconds
      */
     void setPeriod(const double& period_seconds);
+
+    /**
+     * @brief Updates the timer thread to Realtime priority
+     * @return True on success
+     */
+    bool setRealtimePriority();
 
 private:
     std::shared_ptr<std::thread> thread_ptr;

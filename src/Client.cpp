@@ -92,6 +92,13 @@ bool Client::startReadThread() {
     return true;
 }
 
+bool Client::setRealtimePriority() {
+    sched_param sch_params;
+    sch_params.sched_priority = 80;
+
+    return pthread_setschedparam(this->thread.native_handle(), SCHED_FIFO, &sch_params) != 0;
+}
+
 bool Client::stopReadThread() {
     bool rc = false;
     if(running_.test_and_set()) {
