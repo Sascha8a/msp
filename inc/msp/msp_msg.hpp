@@ -217,7 +217,8 @@ enum class ID : uint16_t {
     MSP2_INAV_SET_BATTERY_CONFIG = 0x2006,
     MSP2_INAV_RATE_PROFILE       = 0x2007,
     MSP2_INAV_SET_RATE_PROFILE   = 0x2008,
-    MSP2_INAV_AIR_SPEED          = 0x2009
+    MSP2_INAV_AIR_SPEED          = 0x2009,
+    MSP2_BTFL_PUSH               = 0x300B,  // out message, specific data sent without a request
 };
 
 enum class ArmingFlags : uint32_t {
@@ -5547,6 +5548,34 @@ struct InavAirSpeed : public InavMiscSettings, public Message {
 
     virtual bool decode(const ByteVector& data) override {
         return data.unpack(speed);
+    }
+};
+
+// MSP2_BTFL_PUSH                = 0x300B,
+struct BtflPush : public Message {
+    BtflPush(FirmwareVariant v) : Message(v) {}
+
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH; }
+
+    Value<uint32_t> current_time_us;
+    Value<int16_t> acc_x;
+    Value<int16_t> acc_y;
+    Value<int16_t> acc_z;
+    Value<int16_t> gyro_x; // filtered gyro data
+    Value<int16_t> gyro_y;
+    Value<int16_t> gyro_z;
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= data.unpack(current_time_us);
+        rc &= data.unpack(acc_x);
+        rc &= data.unpack(acc_y);
+        rc &= data.unpack(acc_z);
+        rc &= data.unpack(gyro_x);
+        rc &= data.unpack(gyro_y);
+        rc &= data.unpack(gyro_z);
+
+        return rc;
     }
 };
 
