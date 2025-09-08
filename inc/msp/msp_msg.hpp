@@ -218,7 +218,8 @@ enum class ID : uint16_t {
     MSP2_INAV_RATE_PROFILE       = 0x2007,
     MSP2_INAV_SET_RATE_PROFILE   = 0x2008,
     MSP2_INAV_AIR_SPEED          = 0x2009,
-    MSP2_BTFL_PUSH               = 0x300B,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_100           = 0x300B,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_400           = 0x300C,  // out message, specific data sent without a request
 };
 
 enum class ArmingFlags : uint32_t {
@@ -5551,16 +5552,73 @@ struct InavAirSpeed : public InavMiscSettings, public Message {
     }
 };
 
-// MSP2_BTFL_PUSH                = 0x300B,
-struct BtflPush : public Message {
-    BtflPush(FirmwareVariant v) : Message(v) {}
+// MSP2_BTFL_PUSH_100           = 0x300B,
+struct BtflPush100 : public Message {
+    BtflPush100(FirmwareVariant v) : Message(v) {}
 
-    virtual ID id() const override { return ID::MSP2_BTFL_PUSH; }
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_100; }
 
     Value<uint32_t> current_time_us;
+
+    Value<int16_t> att_roll;
+    Value<int16_t> att_pitch;
+    Value<int16_t> att_yaw;
+
+    Value<uint32_t> altitude;
+    Value<int16_t> vario;
+
+    Value<uint16_t> voltage;
+    Value<int16_t> amperage;
+
+    Value<int16_t> rc_roll;
+    Value<int16_t> rc_pitch;
+    Value<int16_t> rc_yaw;
+    Value<int16_t> rc_throttle;
+    Value<int16_t> rc_aux1;
+    Value<int16_t> rc_aux2;
+
+    Value<uint16_t> motor0_rpm;
+    Value<uint16_t> motor1_rpm;
+    Value<uint16_t> motor2_rpm;
+    Value<uint16_t> motor3_rpm;
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= data.unpack(current_time_us);
+        rc &= data.unpack(att_roll);
+        rc &= data.unpack(att_pitch);
+        rc &= data.unpack(att_yaw);
+        rc &= data.unpack(altitude);
+        rc &= data.unpack(vario);
+        rc &= data.unpack(voltage);
+        rc &= data.unpack(amperage);
+        rc &= data.unpack(rc_roll);
+        rc &= data.unpack(rc_pitch);
+        rc &= data.unpack(rc_yaw);
+        rc &= data.unpack(rc_throttle);
+        rc &= data.unpack(rc_aux1);
+        rc &= data.unpack(rc_aux2);
+        rc &= data.unpack(motor0_rpm);
+        rc &= data.unpack(motor1_rpm);
+        rc &= data.unpack(motor2_rpm);
+        rc &= data.unpack(motor3_rpm);
+
+        return rc;
+    }
+};
+
+// MSP2_BTFL_PUSH_400           = 0x300C,
+struct BtflPush400 : public Message {
+    BtflPush400(FirmwareVariant v) : Message(v) {}
+
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_400; }
+
+    Value<uint32_t> current_time_us;
+
     Value<int16_t> acc_x;
     Value<int16_t> acc_y;
     Value<int16_t> acc_z;
+
     Value<int16_t> gyro_x; // filtered gyro data
     Value<int16_t> gyro_y;
     Value<int16_t> gyro_z;
