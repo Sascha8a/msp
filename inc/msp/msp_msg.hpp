@@ -5560,15 +5560,15 @@ struct BtflPush100 : public Message {
 
     Value<uint32_t> current_time_us;
 
-    Value<int16_t> att_roll;
-    Value<int16_t> att_pitch;
+    Value<float> att_roll;
+    Value<float> att_pitch;
     Value<int16_t> att_yaw;
 
-    Value<uint32_t> altitude;
-    Value<int16_t> vario;
+    Value<float> altitude;      // m
+    Value<float> vario;         // m/s
 
-    Value<uint16_t> voltage;
-    Value<int16_t> amperage;
+    Value<float> voltage;       // Volt
+    Value<float> amperage;      // Ampere
 
     Value<int16_t> rc_roll;
     Value<int16_t> rc_pitch;
@@ -5585,19 +5585,24 @@ struct BtflPush100 : public Message {
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
         rc &= data.unpack(current_time_us);
-        rc &= data.unpack(att_roll);
-        rc &= data.unpack(att_pitch);
+
+        rc &= data.unpack<int16_t>(att_roll, 10);
+        rc &= data.unpack<int16_t>(att_pitch, 10);
         rc &= data.unpack(att_yaw);
-        rc &= data.unpack(altitude);
-        rc &= data.unpack(vario);
-        rc &= data.unpack(voltage);
-        rc &= data.unpack(amperage);
+
+        rc &= data.unpack<int32_t>(altitude, 100);
+        rc &= data.unpack<int16_t>(vario, 100);
+
+        rc &= data.unpack<uint8_t>(voltage, 10);
+        rc &= data.unpack<int8_t>(amperage, 100);
+
         rc &= data.unpack(rc_roll);
         rc &= data.unpack(rc_pitch);
         rc &= data.unpack(rc_yaw);
         rc &= data.unpack(rc_throttle);
         rc &= data.unpack(rc_aux1);
         rc &= data.unpack(rc_aux2);
+
         rc &= data.unpack(motor0_rpm);
         rc &= data.unpack(motor1_rpm);
         rc &= data.unpack(motor2_rpm);
@@ -5626,9 +5631,11 @@ struct BtflPush400 : public Message {
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
         rc &= data.unpack(current_time_us);
+
         rc &= data.unpack(acc_x);
         rc &= data.unpack(acc_y);
         rc &= data.unpack(acc_z);
+
         rc &= data.unpack(gyro_x);
         rc &= data.unpack(gyro_y);
         rc &= data.unpack(gyro_z);
