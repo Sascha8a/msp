@@ -218,8 +218,9 @@ enum class ID : uint16_t {
     MSP2_INAV_RATE_PROFILE       = 0x2007,
     MSP2_INAV_SET_RATE_PROFILE   = 0x2008,
     MSP2_INAV_AIR_SPEED          = 0x2009,
-    MSP2_BTFL_PUSH_100           = 0x300B,  // out message, specific data sent without a request
-    MSP2_BTFL_PUSH_400           = 0x300C,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_60            = 0x300B,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_120           = 0x300C,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_360           = 0x300D,  // out message, specific data sent without a request
 };
 
 enum class ArmingFlags : uint32_t {
@@ -5552,23 +5553,72 @@ struct InavAirSpeed : public InavMiscSettings, public Message {
     }
 };
 
-// MSP2_BTFL_PUSH_100           = 0x300B,
-struct BtflPush100 : public Message {
-    BtflPush100(FirmwareVariant v) : Message(v) {}
+// MSP2_BTFL_PUSH_60           = 0x300B,
+struct BtflPush60 : public Message {
+    BtflPush60(FirmwareVariant v) : Message(v) {}
 
-    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_100; }
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_60; }
 
     Value<uint32_t> current_time_us;
 
-    Value<float> att_roll;
-    Value<float> att_pitch;
-    Value<int16_t> att_yaw;
+    Value<int16_t> acc_x;
+    Value<int16_t> acc_y;
+    Value<int16_t> acc_z;
+
+    // filtered gyro data
+    Value<int16_t> gyro_x;
+    Value<int16_t> gyro_y;
+    Value<int16_t> gyro_z;
 
     Value<float> altitude;      // m
     Value<float> vario;         // m/s
 
     Value<float> voltage;       // Volt
     Value<float> amperage;      // Ampere
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+
+        rc &= data.unpack(current_time_us);
+
+        rc &= data.unpack(acc_x);
+        rc &= data.unpack(acc_y);
+        rc &= data.unpack(acc_z);
+
+        rc &= data.unpack(gyro_x);
+        rc &= data.unpack(gyro_y);
+        rc &= data.unpack(gyro_z);
+
+        rc &= data.unpack<int32_t>(altitude, 100);
+        rc &= data.unpack<int16_t>(vario, 100);
+
+        rc &= data.unpack<uint8_t>(voltage, 10);
+        rc &= data.unpack<int8_t>(amperage, 100);
+
+        return rc;
+    }
+};
+
+// MSP2_BTFL_PUSH_120           = 0x300C,
+struct BtflPush120 : public Message {
+    BtflPush120(FirmwareVariant v) : Message(v) {}
+
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_120; }
+
+    Value<uint32_t> current_time_us;
+
+    Value<int16_t> acc_x;
+    Value<int16_t> acc_y;
+    Value<int16_t> acc_z;
+
+    // filtered gyro data
+    Value<int16_t> gyro_x;
+    Value<int16_t> gyro_y;
+    Value<int16_t> gyro_z;
+
+    Value<float> att_roll;
+    Value<float> att_pitch;
+    Value<int16_t> att_yaw;
 
     Value<int16_t> rc_roll;
     Value<int16_t> rc_pitch;
@@ -5584,17 +5634,20 @@ struct BtflPush100 : public Message {
 
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
+
         rc &= data.unpack(current_time_us);
+
+        rc &= data.unpack(acc_x);
+        rc &= data.unpack(acc_y);
+        rc &= data.unpack(acc_z);
+
+        rc &= data.unpack(gyro_x);
+        rc &= data.unpack(gyro_y);
+        rc &= data.unpack(gyro_z);
 
         rc &= data.unpack<int16_t>(att_roll, 10);
         rc &= data.unpack<int16_t>(att_pitch, 10);
         rc &= data.unpack(att_yaw);
-
-        rc &= data.unpack<int32_t>(altitude, 100);
-        rc &= data.unpack<int16_t>(vario, 100);
-
-        rc &= data.unpack<uint8_t>(voltage, 10);
-        rc &= data.unpack<int8_t>(amperage, 100);
 
         rc &= data.unpack(rc_roll);
         rc &= data.unpack(rc_pitch);
@@ -5612,11 +5665,11 @@ struct BtflPush100 : public Message {
     }
 };
 
-// MSP2_BTFL_PUSH_400           = 0x300C,
-struct BtflPush400 : public Message {
-    BtflPush400(FirmwareVariant v) : Message(v) {}
+// MSP2_BTFL_PUSH_360           = 0x300D,
+struct BtflPush360 : public Message {
+    BtflPush360(FirmwareVariant v) : Message(v) {}
 
-    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_400; }
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_360; }
 
     Value<uint32_t> current_time_us;
 
@@ -5624,12 +5677,14 @@ struct BtflPush400 : public Message {
     Value<int16_t> acc_y;
     Value<int16_t> acc_z;
 
-    Value<int16_t> gyro_x; // filtered gyro data
+    // filtered gyro data
+    Value<int16_t> gyro_x;
     Value<int16_t> gyro_y;
     Value<int16_t> gyro_z;
 
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
+
         rc &= data.unpack(current_time_us);
 
         rc &= data.unpack(acc_x);
