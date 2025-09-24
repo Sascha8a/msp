@@ -5592,8 +5592,8 @@ struct BtflPush60 : public Message {
         rc &= data.unpack<int32_t>(altitude, 100);
         rc &= data.unpack<int16_t>(vario, 100);
 
-        rc &= data.unpack<uint8_t>(voltage, 10);
-        rc &= data.unpack<int8_t>(amperage, 100);
+        rc &= data.unpack<uint16_t>(voltage, 100);
+        rc &= data.unpack<int16_t>(amperage, 100);
 
         return rc;
     }
@@ -5616,9 +5616,9 @@ struct BtflPush120 : public Message {
     Value<int16_t> gyro_y;
     Value<int16_t> gyro_z;
 
-    Value<float> att_roll;
-    Value<float> att_pitch;
-    Value<int16_t> att_yaw;
+    Value<float> att_roll;  // [-180, +180] degree
+    Value<float> att_pitch; // [-90, +90] degree
+    Value<int16_t> att_yaw; // [-180, +180] degree
 
     Value<int16_t> rc_roll;
     Value<int16_t> rc_pitch;
