@@ -5657,7 +5657,7 @@ struct BtflPush120 : public Message {
 
 // MSP2_BTFL_PUSH_480           = 0x300D,
 struct BtflPush480 : public Message {
-    BtflPush360(FirmwareVariant v) : Message(v) {}
+    BtflPush480(FirmwareVariant v) : Message(v) {}
 
     virtual ID id() const override { return ID::MSP2_BTFL_PUSH_480; }
 
