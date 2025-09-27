@@ -220,7 +220,7 @@ enum class ID : uint16_t {
     MSP2_INAV_AIR_SPEED          = 0x2009,
     MSP2_BTFL_PUSH_60            = 0x300B,  // out message, specific data sent without a request
     MSP2_BTFL_PUSH_120           = 0x300C,  // out message, specific data sent without a request
-    MSP2_BTFL_PUSH_360           = 0x300D,  // out message, specific data sent without a request
+    MSP2_BTFL_PUSH_480           = 0x300D,  // out message, specific data sent without a request
 };
 
 enum class ArmingFlags : uint32_t {
@@ -5627,11 +5627,6 @@ struct BtflPush120 : public Message {
     Value<int16_t> rc_aux1;
     Value<int16_t> rc_aux2;
 
-    Value<uint16_t> motor0_rpm;
-    Value<uint16_t> motor1_rpm;
-    Value<uint16_t> motor2_rpm;
-    Value<uint16_t> motor3_rpm;
-
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
 
@@ -5656,20 +5651,15 @@ struct BtflPush120 : public Message {
         rc &= data.unpack(rc_aux1);
         rc &= data.unpack(rc_aux2);
 
-        rc &= data.unpack(motor0_rpm);
-        rc &= data.unpack(motor1_rpm);
-        rc &= data.unpack(motor2_rpm);
-        rc &= data.unpack(motor3_rpm);
-
         return rc;
     }
 };
 
-// MSP2_BTFL_PUSH_360           = 0x300D,
-struct BtflPush360 : public Message {
+// MSP2_BTFL_PUSH_480           = 0x300D,
+struct BtflPush480 : public Message {
     BtflPush360(FirmwareVariant v) : Message(v) {}
 
-    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_360; }
+    virtual ID id() const override { return ID::MSP2_BTFL_PUSH_480; }
 
     Value<uint32_t> current_time_us;
 
