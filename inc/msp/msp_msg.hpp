@@ -5618,7 +5618,7 @@ struct BtflPush120 : public Message {
 
     Value<float> att_roll;  // [-180, +180] degree
     Value<float> att_pitch; // [-90, +90] degree
-    Value<int16_t> att_yaw; // [-180, +180] degree
+    Value<float> att_yaw; // [-180, +180] degree
 
     Value<int16_t> rc_roll;
     Value<int16_t> rc_pitch;
@@ -5642,7 +5642,7 @@ struct BtflPush120 : public Message {
 
         rc &= data.unpack<int16_t>(att_roll, 10);
         rc &= data.unpack<int16_t>(att_pitch, 10);
-        rc &= data.unpack(att_yaw);
+        rc &= data.unpack<int16_t>(att_yaw, 10);
 
         rc &= data.unpack(rc_roll);
         rc &= data.unpack(rc_pitch);
